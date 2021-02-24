@@ -1,3 +1,4 @@
+import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -60,9 +61,24 @@ def FindElemets(webDriver):
             elem_text = elem.find_elements(By.CLASS_NAME, 'text-container.typo.typo_text_m.typo_line_m.organic__text')
             extendetTextLis.append(elem_text[0].text)
 
+    # Открытие ссылок результатов
     for elem in elementLink:
         elem.click()
-        
+
+
+
+    # Создаем папку для скринов
+    if not os.path.exists('screens'):
+        os.makedirs('screens')
+
+    handles = webDriver.window_handles  # Список открытых вкладок в браузере
+
+    picNum = 1
+    for tab in handles[1:]:
+        webDriver.switch_to_window(tab)  # Переключаемся по каждой вкладке
+        webDriver.get_screenshot_as_file('screens/scr' + str(picNum) + '.png')  # Делаем скрин в папку 'screens'
+        picNum += 1
+
 inWebDriver = WebDriverInit(gWebDriverFullPath, gChromeExeFullPath, gExtensionFullPathList)
 
 FindElemets(inWebDriver)
