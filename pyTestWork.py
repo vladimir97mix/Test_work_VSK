@@ -91,7 +91,7 @@ def FindElemets(webDriver):
 
     doc.save('Отчет по ключевой фразе_{}.rtf'.format(int(time.time())))  # Сохранение файла
 
-    shutil.rmtree('screens/')  # Удаление папки скринов за ненадобностью
+    shutil.rmtree('screens/', ignore_errors=True)  # Удаление папки скринов за ненадобностью
 
     webDriver.quit()  # Закрытие браузера
 
