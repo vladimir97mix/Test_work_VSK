@@ -1,5 +1,6 @@
 import os
 import time
+import shutil
 from docx import Document
 from docx.shared import Inches
 from selenium import webdriver
@@ -14,21 +15,21 @@ gWebDriverFullPath = r'Resources\SeleniumWebDrivers\Chrome\chromedriver_win32 v8
 
 
 def WebDriverInit(inWebDriverFullPath, inChromeExeFullPath, inExtensionFullPathList):
-    # Set full path to exe of the chrome
+    # Определение полного пути к брузеру и драйверу
     lWebDriverChromeOptionsInstance = webdriver.ChromeOptions()
     lWebDriverChromeOptionsInstance.binary_location = inChromeExeFullPath
-    # Add extensions
+    # Добавление расширений
     for lExtensionItemFullPath in inExtensionFullPathList:
         lWebDriverChromeOptionsInstance.add_extension(lExtensionItemFullPath)
-    # Run chrome instance
+    # Запустить экземпляр Chrome
     lWebDriverInstance = None
     if inWebDriverFullPath:
-        # Run with specified web driver path
+        # Запустить с указанным путем веб-драйвера
         lWebDriverInstance = webdriver.Chrome(executable_path=inWebDriverFullPath,
                                               options=lWebDriverChromeOptionsInstance)
     else:
         lWebDriverInstance = webdriver.Chrome(options=lWebDriverChromeOptionsInstance)
-    # Return the result
+    # Вернуть результат
     return lWebDriverInstance
 
 
@@ -88,10 +89,16 @@ def FindElemets(webDriver):
         picNum -= 1  # Декримент скринов
         strNum += 1  # Инкримент номера заголовка
 
-    doc.save('Отчет по ключевой фразе_{}.rtf'.format(int(time.time())))
+    doc.save('Отчет по ключевой фразе_{}.rtf'.format(int(time.time())))  # Сохранение файла
 
+    shutil.rmtree('screens/')  # Удаление папки скринов за ненадобностью
 
+    webDriver.quit()  # Закрытие браузера
+
+# Инициализация веб драйвера
 inWebDriver = WebDriverInit(gWebDriverFullPath, gChromeExeFullPath, gExtensionFullPathList)
 
+# Запуск задачи для веб драйвера
 FindElemets(inWebDriver)
+
 
