@@ -1,4 +1,5 @@
 import os
+import time
 from docx import Document
 from docx.shared import Inches
 from selenium import webdriver
@@ -80,15 +81,17 @@ def FindElemets(webDriver):
     doc = Document()
     for txtTitle, txtExt in zip (titleTextList, extendetTextLis):  # Циклл по спискам заголовков
         p = doc.add_paragraph()  # Создаем новый абзац
-        run = p.add_run(strNum + ' ' + txtTitle)  # Добавляем текст
+        run = p.add_run(str(strNum) + ' ' + txtTitle)  # Добавляем текст
         run.bold = True  # Делаем текст жирным
         doc.add_paragraph(txtExt)  # Вставляем подзаголовок в новый абзац
         doc.add_picture('screens/scr' + str(picNum) + '.png', width=Inches(4.0))  # Вставляем скриншот, шириной 4 дюйма
         picNum -= 1  # Декримент скринов
         strNum += 1  # Инкримент номера заголовка
 
-    doc.save('Отчет по ключевой фразе.rtf')
+    doc.save('Отчет по ключевой фразе_{}.rtf'.format(int(time.time())))
+
 
 inWebDriver = WebDriverInit(gWebDriverFullPath, gChromeExeFullPath, gExtensionFullPathList)
 
 FindElemets(inWebDriver)
+
