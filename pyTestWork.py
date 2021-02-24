@@ -40,8 +40,30 @@ def FindElemets(webDriver):
     # Нажимаем на ENTER
     element.send_keys(Keys.RETURN)
 
+    elementMain = webDriver.find_elements(By.CLASS_NAME, 'serp-item')  # Основные эелементы поиска (li)
+    elementLink = webDriver.find_elements(By.CLASS_NAME, 'OrganicTitle-Link')  # Линки для перехода по ссылкам
 
+    titleTextList = []  # Список заголовков
+    extendetTextLis = []  # Список подзаголовков
 
+    for elem in elementMain:
+        # Ищем в элементах заголовки и вносим текст в список
+        if elem.find_elements(By.CLASS_NAME, 'OrganicTitle-LinkText'):
+            elem_text = elem.find_elements(By.CLASS_NAME, 'OrganicTitle-LinkText')
+            titleTextList.append(elem_text[0].text)
+        # Ищем в элементах позаголовки с классом Organic-Text и вносим текст в список
+        if elem.find_elements(By.CLASS_NAME, 'Organic-Text'):
+            elem_text = elem.find_elements(By.CLASS_NAME, 'Organic-Text')
+            extendetTextLis.append(elem_text[0].text)
+        # Ищем в элементах позаголовки с классом text-container и вносим текст в список
+        if elem.find_elements(By.CLASS_NAME, 'text-container.typo.typo_text_m.typo_line_m.organic__text'):
+            elem_text = elem.find_elements(By.CLASS_NAME, 'text-container.typo.typo_text_m.typo_line_m.organic__text')
+            extendetTextLis.append(elem_text[0].text)
+
+    for elem in elementLink:
+        elem.click()
+        
 inWebDriver = WebDriverInit(gWebDriverFullPath, gChromeExeFullPath, gExtensionFullPathList)
 
 FindElemets(inWebDriver)
+
