@@ -61,21 +61,23 @@ def FindElemets(webDriver):
             elem_text = elem.find_elements(By.CLASS_NAME, 'text-container.typo.typo_text_m.typo_line_m.organic__text')
             extendetTextLis.append(elem_text[0].text)
 
-    # Открытие ссылок результатов
-    for elem in elementLink:
-        elem.click()
-
     # Создаем папку для скринов
     if not os.path.exists('screens'):
         os.makedirs('screens')
-
-    handles = webDriver.window_handles  # Список открытых вкладок в браузере
-
     picNum = 1
-    for tab in handles[1:]:
-        webDriver.switch_to_window(tab)  # Переключаемся по каждой вкладке, кроме первой - yandex.ru
-        webDriver.get_screenshot_as_file('screens/scr' + str(picNum) + '.png')  # Делаем скрин в папку 'screens'
-        picNum += 1
+    # Открытие ссылок результатов
+    for elem in elementLink:
+        elem.click()
+        handles = webDriver.window_handles  # Список открытых вкладок в браузере
+
+
+        for tab in handles[1:]:
+            webDriver.switch_to_window(tab)  # Переключаемся по каждой вкладке, кроме первой - yandex.ru
+            webDriver.get_screenshot_as_file('screens/scr' + str(picNum) + '.png')  # Делаем скрин в папку 'screens'
+            picNum += 1
+            webDriver.close()
+            webDriver.switch_to_window(handles[0])
+
 
     picNum -= 1
     strNum = 1  # Нумерация заголовка
@@ -89,7 +91,7 @@ def FindElemets(webDriver):
         picNum -= 1  # Декримент скринов
         strNum += 1  # Инкримент номера заголовка
 
-    doc.save('Отчет по ключевой фразе_{}.rtf'.format(int(time.time())))  # Сохранение файла
+    doc.save('Отчет по ключевой фразе_{}.docx'.format(int(time.time())))  # Сохранение файла
 
     shutil.rmtree('screens/', ignore_errors=True)  # Удаление папки скринов за ненадобностью
 
