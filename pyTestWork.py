@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
+from pyOpenRPA.Robot import UIDesktop
 
 gChromeExeFullPath = r'Resources\GoogleChromePortable\App\Chrome-bin\chrome.exe'
 gExtensionFullPathList = []
@@ -70,7 +71,6 @@ def FindElemets(webDriver):
         elem.click()
         handles = webDriver.window_handles  # Список открытых вкладок в браузере
 
-
         for tab in handles[1:]:
             webDriver.switch_to_window(tab)  # Переключаемся по каждой вкладке, кроме первой - yandex.ru
             webDriver.get_screenshot_as_file('screens/scr' + str(picNum) + '.png')  # Делаем скрин в папку 'screens'
@@ -78,29 +78,71 @@ def FindElemets(webDriver):
             webDriver.close()
             webDriver.switch_to_window(handles[0])
 
+    webDriver.quit()  # Закрытие браузера
 
     picNum -= 1
     strNum = 1  # Нумерация заголовка
-    doc = Document()
-    for txtTitle, txtExt in zip (titleTextList, extendetTextLis):  # Циклл по спискам заголовков
-        p = doc.add_paragraph()  # Создаем новый абзац
-        run = p.add_run(str(strNum) + ' ' + txtTitle)  # Добавляем текст
-        run.bold = True  # Делаем текст жирным
-        doc.add_paragraph(txtExt)  # Вставляем подзаголовок в новый абзац
-        doc.add_picture('screens/scr' + str(picNum) + '.png', width=Inches(4.0))  # Вставляем скриншот, шириной 4 дюйма
-        picNum -= 1  # Декримент скринов
-        strNum += 1  # Инкримент номера заголовка
 
-    doc.save('Отчет по ключевой фразе_{}.docx'.format(int(time.time())))  # Сохранение файла
+    wpSel = [
+        {"title": "Документ - WordPad", "class_name": "WordPadClass", "backend": "win32"}]  # Сформировали UIO селектор
+    lExistBool = UIDesktop.UIOSelector_Exist_Bool(inUIOSelector=wpSel)  # Проверить наличие окна по UIO селектору
+    if not lExistBool:  # Проверить наличие окна wordpad
+        os.system("write")  # Открыть wordpad
+        time.sleep(2)
+    else:  # Проверить, что окно калькулятора не свернуто
+        UIOWordPad = UIDesktop.UIOSelector_Get_UIO(inSpecificationList=wpSel)  # Получить UIO экземпляр
+        if UIOWordPad.is_minimized():  # Проверить, что wordpad находится в свернутом виде
+            UIOWordPad.restore()  # Восстановить окно wordpad из свернутого вида
+        # Проверить наличие UI элемента по UIO селектору
+    lWP_IsExistBool = UIDesktop.UIOSelector_Exist_Bool(inUIOSelector=[{"title": "Документ - WordPad",
+                                                                       "class_name": "WordPadClass",
+                                                                       "backend": "win32"},
+                                                                      {"title": "Окно Rich Text", "rich_text": "",
+                                                                       "ctrl_index": 4}])
+    if lWP_IsExistBool:
+        uio = UIDesktop.UIOSelector_Get_UIO(inSpecificationList=[{"title": "Документ - WordPad",
+                                                                  "class_name": "WordPadClass",
+                                                                  "backend": "win32"},
+                                                                 {"title": "Окно Rich Text", "rich_text": "",
+                                                                  "ctrl_index": 4}])
+    uioPasteImg = UIDesktop.UIOSelector_Get_UIO([{"class_name": "WordPadClass", "backend": "uia"},
+                                               {"title": "Изображение", "depth_start": 11, "depth_end": 11}])
 
-    shutil.rmtree('screens/', ignore_errors=True)  # Удаление папки скринов за ненадобностью
 
-    webDriver.quit()  # Закрытие браузера
+    for txtTitle, txtExtTitle in zip( titleTextList, extendetTextLis):
+        uio.type_keys('^b')
+        uio.type_keys(str(strNum) + ' ' + txtTitle)
+        uio.type_keys('{ENTER}')
+        uio.type_keys('^b')
+        uio.type_keys(txtExtTitle)
+        uio.type_keys('{ENTER}')
+        uioPasteImg.click_input()
+        uioFilename = UIDesktop.UIOSelector_Get_UIO([{"class_name": "WordPadClass", "backend": "uia"},
+                                                     {"title": "Имя файла:", "depth_start": 3, "depth_end": 3}])
+        uioFilename.type_keys(os.path.abspath('screens/scr' + str(picNum) + '.png'))
+        uioFilename.type_keys('{ENTER}')
+
+    # doc = Document()
+    # for txtTitle, txtExt in zip (titleTextList, extendetTextLis):  # Циклл по спискам заголовков
+    #     p = doc.add_paragraph()  # Создаем новый абзац
+    #     run = p.add_run(str(strNum) + ' ' + txtTitle)  # Добавляем текст
+    #     run.bold = True  # Делаем текст жирным
+    #     doc.add_paragraph(txtExt)  # Вставляем подзаголовок в новый абзац
+    #     doc.add_picture('screens/scr' + str(picNum) + '.png', width=Inches(4.0))  # Вставляем скриншот, шириной 4 дюйма
+    #     picNum -= 1  # Декримент скринов
+    #     strNum += 1  # Инкримент номера заголовка
+    #
+    # doc.save('Отчет по ключевой фразе_{}.docx'.format(int(time.time())))  # Сохранение файла
+
+
+
 
 # Инициализация веб драйвера
 inWebDriver = WebDriverInit(gWebDriverFullPath, gChromeExeFullPath, gExtensionFullPathList)
 
 # Запуск задачи для веб драйвера
 FindElemets(inWebDriver)
+
+shutil.rmtree('screens/', ignore_errors=True)  # Удаление папки скринов за ненадобностью
 
 
