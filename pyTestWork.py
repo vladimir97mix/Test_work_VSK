@@ -100,7 +100,7 @@ def FindElemets(webDriver):
                                                                       {"title": "Окно Rich Text", "rich_text": "",
                                                                        "ctrl_index": 4}])
     if lWP_IsExistBool:
-        uio = UIDesktop.UIOSelector_Get_UIO(inSpecificationList=[{"title": "Документ - WordPad",
+        uioRichText = UIDesktop.UIOSelector_Get_UIO(inSpecificationList=[{"title": "Документ - WordPad",
                                                                   "class_name": "WordPadClass",
                                                                   "backend": "win32"},
                                                                  {"title": "Окно Rich Text", "rich_text": "",
@@ -109,28 +109,29 @@ def FindElemets(webDriver):
                                                {"title": "Изображение", "depth_start": 11, "depth_end": 11}])
 
     for txtTitle, txtExtTitle in zip( titleTextList, extendetTextLis):
-        uio.type_keys('^b')
-        uio.type_keys(str(strNum) + '{SPACE}' + txtTitle, with_spaces=True)
-        uio.type_keys('{ENTER}')
-        uio.type_keys('^b')
-        uio.type_keys(txtExtTitle, with_spaces=True)
-        uio.type_keys('{ENTER}')
+        uioRichText.type_keys('^b')
+        uioRichText.type_keys(str(strNum) + '{SPACE}' + txtTitle, with_spaces=True)
+        uioRichText.type_keys('{ENTER}')
+        uioRichText.type_keys('^b')
+        uioRichText.type_keys(txtExtTitle, with_spaces=True)
+        uioRichText.type_keys('{ENTER}')
         uioPasteImg.click_input()
-        UIDesktop.UIOSelector_Exist_Bool([{"class_name": "WordPadClass", "backend": "uia"},
-                                          {"title": "Имя файла:", "depth_start": 3, "depth_end": 3}])
-        uioFilename = UIDesktop.UIOSelector_Get_UIO([{"class_name": "WordPadClass", "backend": "uia"},
-                                                     {"title": "Имя файла:", "depth_start": 3, "depth_end": 3}])
+        if UIDesktop.UIOSelector_Exist_Bool([{"class_name": "WordPadClass", "backend": "uia"},
+                                          {"title": "Имя файла:", "depth_start": 3, "depth_end": 3}]):
+            uioFilename = UIDesktop.UIOSelector_Get_UIO([{"class_name": "WordPadClass", "backend": "uia"},
+                                                         {"title": "Имя файла:", "depth_start": 3, "depth_end": 3}])
         uioFilename.type_keys(os.path.abspath('screens/scr' + str(picNum) + '.png'))
         uioFilename.type_keys('{ENTER}')
+        uioRichText.type_keys('{ENTER}')
         strNum += 1
         picNum += 1
 
-    uio.type_keys('^s')
+    uioRichText.type_keys('^s')
     UIDesktop.UIOSelector_Exist_Bool([{"class_name": "WordPadClass", "backend": "uia"},
                                       {"title": "Имя файла:", "depth_start": 4, "depth_end": 4}])
     uioFilename = UIDesktop.UIOSelector_Get_UIO([{"class_name": "WordPadClass", "backend": "uia"},
                                                  {"title": "Имя файла:", "depth_start": 4, "depth_end": 4}])
-    uioFilename.type_keys(os.path.abspath('Отчет по ключевой фразе.rtf'))
+    uioFilename.type_keys(os.path.abspath('Отчет по ключевой фразе_{}.rtf'.format(int(time.time()))), with_spaces=True)
     uioFilename.type_keys('{ENTER}')
 
     webDriver.quit()
@@ -155,5 +156,3 @@ inWebDriver = WebDriverInit(gWebDriverFullPath, gChromeExeFullPath, gExtensionFu
 FindElemets(inWebDriver)
 
 shutil.rmtree('screens/', ignore_errors=True)  # Удаление папки скринов за ненадобностью
-
-
