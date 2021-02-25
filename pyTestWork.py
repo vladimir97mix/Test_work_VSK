@@ -78,9 +78,9 @@ def FindElemets(webDriver):
             webDriver.close()
             webDriver.switch_to_window(handles[0])
 
-    webDriver.quit()  # Закрытие браузера
+    # webDriver.quit()  # Закрытие браузера
 
-    picNum -= 1
+    picNum = 1  # Нумерация заголовка
     strNum = 1  # Нумерация заголовка
 
     wpSel = [
@@ -89,7 +89,7 @@ def FindElemets(webDriver):
     if not lExistBool:  # Проверить наличие окна wordpad
         os.system("write")  # Открыть wordpad
         time.sleep(2)
-    else:  # Проверить, что окно калькулятора не свернуто
+    else:  # Проверить, что окно wordpad не свернуто
         UIOWordPad = UIDesktop.UIOSelector_Get_UIO(inSpecificationList=wpSel)  # Получить UIO экземпляр
         if UIOWordPad.is_minimized():  # Проверить, что wordpad находится в свернутом виде
             UIOWordPad.restore()  # Восстановить окно wordpad из свернутого вида
@@ -108,34 +108,45 @@ def FindElemets(webDriver):
     uioPasteImg = UIDesktop.UIOSelector_Get_UIO([{"class_name": "WordPadClass", "backend": "uia"},
                                                {"title": "Изображение", "depth_start": 11, "depth_end": 11}])
 
-
     for txtTitle, txtExtTitle in zip( titleTextList, extendetTextLis):
         uio.type_keys('^b')
-        uio.type_keys(str(strNum) + ' ' + txtTitle)
+        uio.type_keys(str(strNum) + '{SPACE}' + txtTitle, with_spaces=True)
         uio.type_keys('{ENTER}')
         uio.type_keys('^b')
-        uio.type_keys(txtExtTitle)
+        uio.type_keys(txtExtTitle, with_spaces=True)
         uio.type_keys('{ENTER}')
         uioPasteImg.click_input()
+        UIDesktop.UIOSelector_Exist_Bool([{"class_name": "WordPadClass", "backend": "uia"},
+                                          {"title": "Имя файла:", "depth_start": 3, "depth_end": 3}])
         uioFilename = UIDesktop.UIOSelector_Get_UIO([{"class_name": "WordPadClass", "backend": "uia"},
                                                      {"title": "Имя файла:", "depth_start": 3, "depth_end": 3}])
         uioFilename.type_keys(os.path.abspath('screens/scr' + str(picNum) + '.png'))
         uioFilename.type_keys('{ENTER}')
+        strNum += 1
+        picNum += 1
 
+    uio.type_keys('^s')
+    UIDesktop.UIOSelector_Exist_Bool([{"class_name": "WordPadClass", "backend": "uia"},
+                                      {"title": "Имя файла:", "depth_start": 4, "depth_end": 4}])
+    uioFilename = UIDesktop.UIOSelector_Get_UIO([{"class_name": "WordPadClass", "backend": "uia"},
+                                                 {"title": "Имя файла:", "depth_start": 4, "depth_end": 4}])
+    uioFilename.type_keys(os.path.abspath('Отчет по ключевой фразе.rtf'))
+    uioFilename.type_keys('{ENTER}')
+
+    webDriver.quit()
+    ####################################################################################################################
     # doc = Document()
     # for txtTitle, txtExt in zip (titleTextList, extendetTextLis):  # Циклл по спискам заголовков
     #     p = doc.add_paragraph()  # Создаем новый абзац
     #     run = p.add_run(str(strNum) + ' ' + txtTitle)  # Добавляем текст
     #     run.bold = True  # Делаем текст жирным
     #     doc.add_paragraph(txtExt)  # Вставляем подзаголовок в новый абзац
-    #     doc.add_picture('screens/scr' + str(picNum) + '.png', width=Inches(4.0))  # Вставляем скриншот, шириной 4 дюйма
+    #     doc.add_picture('screens/scr' + str(picNum) + '.png', width=Inches(4.0)) # Вставляем скриншот, шириной 4 дюйма
     #     picNum -= 1  # Декримент скринов
     #     strNum += 1  # Инкримент номера заголовка
     #
     # doc.save('Отчет по ключевой фразе_{}.docx'.format(int(time.time())))  # Сохранение файла
-
-
-
+    ####################################################################################################################
 
 # Инициализация веб драйвера
 inWebDriver = WebDriverInit(gWebDriverFullPath, gChromeExeFullPath, gExtensionFullPathList)
