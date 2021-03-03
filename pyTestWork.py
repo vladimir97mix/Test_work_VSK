@@ -141,6 +141,7 @@ def wordPadWriter():
         uioFilename.type_keys('{ENTER}')
 
 
+
 # Инициализация веб драйвера
 inWebDriver = WebDriverInit(gWebDriverFullPath, gChromeExeFullPath, gExtensionFullPathList)
 
