@@ -1,8 +1,6 @@
 import os
 import time
 import shutil
-from docx import Document
-from docx.shared import Inches
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -141,6 +139,7 @@ def wordPadWriter():
         uioFilename.type_keys(os.path.abspath('Отчет по ключевой фразе_{}.rtf'.format(int(time.time()))),
                               with_spaces=True)
         uioFilename.type_keys('{ENTER}')
+
 
 # Инициализация веб драйвера
 inWebDriver = WebDriverInit(gWebDriverFullPath, gChromeExeFullPath, gExtensionFullPathList)
