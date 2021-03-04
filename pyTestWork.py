@@ -132,14 +132,14 @@ def wordPadWriter():
         picNum += 1  # Инкримент номера скрина
 
     # Сохраниение файла
-    uioRichText.type_keys('^s''^ы')  # Горячая клавиша "сохранить документ"
-    if UIDesktop.UIOSelector_Exist_Bool(wpFn2):
+    if not UIDesktop.UIOSelector_Exist_Bool(wpFn2):
+        uioRichText.type_keys('^s''^ы')  # Горячая клавиша "сохранить документ"
+    else:
         uioFilename = UIDesktop.UIOSelector_Get_UIO(wpFn2)  # Выбор строки ввода пути к файлу
         # Ввод пути к файлу
         uioFilename.type_keys(os.path.abspath('Отчет по ключевой фразе_{}.rtf'.format(int(time.time()))),
                               with_spaces=True)
         uioFilename.type_keys('{ENTER}')
-
 
 
 # Инициализация веб драйвера
